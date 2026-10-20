@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CampusConnect — Information Security Practical Assignment 2 (Part 2)
 
 CampusConnect is a local student social networking portal built using **PHP, MySQL, HTML, CSS and JavaScript**. The current **Vulnerable Version** demonstrates XSS, CSRF and SQL Injection using fictional student and employee records.
@@ -79,3 +80,6 @@ Run formatting only on intended supported file types and verify PHP functionalit
 ## Scope
 
 The **Vulnerable Version** has been tested locally for the observed attacks above. The **Safe Version** has not yet been completed or verified. The final assignment evidence should include each working payload and matching screenshot, plus blocked-attack evidence after the Safe Version is implemented.
+=======
+# IS_TASK2_WEB
+>>>>>>> b6d419614431f1d26306e0adde74910cd9cbc53d
